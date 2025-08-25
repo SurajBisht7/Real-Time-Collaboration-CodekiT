@@ -268,10 +268,10 @@ body {
 
 @media (max-width: 900px) {
   .edit-container {
-    flex-direction: row;
+    flex-direction: column;
   }
   .sidebar {
-    width: 30%;
+    width: 100%;
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     box-shadow: none;
     padding: 1.5rem 1rem;

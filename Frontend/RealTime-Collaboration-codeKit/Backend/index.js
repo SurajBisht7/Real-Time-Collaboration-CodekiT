@@ -1,4 +1,3 @@
-import { Socket } from "dgram";
 import express from "express"
 import http  from "http"
 import {Server} from "socket.io"
@@ -42,31 +41,6 @@ io.on("connection" ,(socket)=>{
     io.to(roomId).emit("userjoined",Array.from(rooms.get(CurrentRoom)));
     console.log("user has joined" , roomId)
   })
-  socket.on("codeChange",({roomId,code})=>{
-    socket.to(roomId).emit("codeUpdate",code);
-  })
-  socket.on("leaveRoom",()=>{
-    if(CurrentRoom && CurrentUser){
-        rooms.get(CurrentRoom).delete(CurrentUser);
-        io.to(CurrentRoom).emit("userjoined",Array.from(rooms.get(CurrentRoom)));
-
-        socket.leave(CurrentRoom)
-        CurrentRoom = null;
-        CurrentUser = null;
-      }
-  })
-
-  socket.on("typing",({roomId,userName})=>{
-    socket.to(roomId).emit("userTyping",userName)
-
-  })
-   socket.on("disconnect",()=>{
-      if(CurrentRoom && CurrentUser){
-        rooms.get(CurrentRoom).delete(CurrentUser);
-        io.to(CurrentRoom).emit("userjoined",Array.from(rooms.get(CurrentRoom)));
-      }
-      console.log("user disconnected")
-    })
 })
 
   httpserver.listen(PORT, ()=>{

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import io from "socket.io-client";
 import Editor from "@monaco-editor/react";
@@ -8,52 +8,18 @@ const socket = io("http://localhost:3000");
 const App = () => {
   const [joined, setjoined] = useState(false);
   const [roomId, setroomId] = useState("");
-  const [userName, setuserName] = useState("");
+  const [username, setUsername] = useState("");
   const [language, setlanguage] = useState("javascript");
   const [code, setcode] = useState("");
 const [copySuccess,setcopySuccess]=  useState("")
-const [users , setUsers] = useState([])
-const [typing ,settyping] = useState("");
-useEffect(()=>{
-  socket.on("userjoined",(users)=>{
-     console.log("Received users:", users);
-    setUsers(users);
-  })
-   socket.on("codeUpdate", (newCode) => {
-      setcode(newCode);
-    });
-    socket.on("userTyping",(user)=>{
-      settyping(`${user.slice(0,8)}... is Typing`)
-      setTimeout(()=> settyping(""),2000)
-    })
-   
-  return ()=>{
-    socket.off("userjoined")
-    socket.off("codeUpdate")
-    socket.off("userTyping")
-  }
-},[])
-
-useEffect(()=>{
-  const handleBeforeunload = ()=>{
-    socket.emit("leaveRoom")
-  }
-
-  window.addEventListener("beforeunload",handleBeforeunload)
-
-  return ()=>{
-    window.removeEventListener("beforeunload", handleBeforeunload)
-  }
-},[])
-
 
   const joinRoom = () => {
-    if (roomId && userName) {
-      socket.emit("join", { roomId, userName });
+    if (roomId && username) {
+      socket.emit("join", { roomId, username });
       setjoined(true);
     }
   };
-  const copyroomid =()=>{ 
+  const copyroomid =()=>{
     navigator.clipboard.writeText(roomId)
     setcopySuccess("Copied!")
     setTimeout(()=>setcopySuccess(""),2000)
@@ -61,8 +27,6 @@ useEffect(()=>{
   
   const handlercodeChange = (newcode)=>{
     setcode(newcode);
-    socket.emit("codeChange",{roomId,code:newcode});
-    socket.emit("typing",{roomId,userName})
   }
   const handleLanguageChange = (e) => {
     const newLanguage = e.target.value;
@@ -82,9 +46,9 @@ useEffect(()=>{
           />
           <input
             type="text"
-            placeholder="userName"
-            value={userName}
-            onChange={(e) => setuserName(e.target.value)}
+            placeholder="UserName"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <button onClick={joinRoom}> Join Room</button>
         </div>
@@ -100,11 +64,10 @@ useEffect(()=>{
 
         <h3> Users in Room:</h3>
         <ul>
-         { users.map((user,index)=> (
-            <li key={index}>{user.slice(0,8)}.......</li>
-        ) )}
+          <li>dfahf</li>
+          <li>sdafjj</li>
         </ul>
-          {typing && <p className='typing-indicator'>{typing}</p>}
+        <p className='typing-indicator'>user typing.....</p>
         <select className='language-selector' value={language} onChange={(e)=>setlanguage(e.target.value)}>
           <option value="javascript">Javascript</option>
           <option value="python">Python</option>
@@ -132,5 +95,3 @@ useEffect(()=>{
 };
 
 export default App;
-
-//1.14

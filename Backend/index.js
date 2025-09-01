@@ -2,14 +2,22 @@ import { Socket } from "dgram";
 import express from "express"
 import http  from "http"
 import {Server} from "socket.io"
+import dotenv from 'dotenv'
+import path from 'path'
+import cors from 'cors'
+dotenv.config()
 
 
 
 const app = express();
 const httpserver = http.createServer(app);
-const PORT = 3000;
+const PORT = process.env.PORT||3000;
 
 
+app.use(cors({
+  origin: process.env.Frontend_url,
+  credentials:true
+}))
 const io = new Server(httpserver,{
   cors:{
     origin : "*",
@@ -71,6 +79,9 @@ io.on("connection" ,(socket)=>{
       console.log("user disconnected")
     })
 })
+
+const __dirname = path.resolve()
+app.use(express.static(path.join(__dirname,"")))
 
   httpserver.listen(PORT, ()=>{
     console.log(`Server is Running http://localhost:${PORT}`)

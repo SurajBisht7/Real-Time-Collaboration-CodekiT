@@ -10,7 +10,7 @@ const App = () => {
   const [roomId, setroomId] = useState("");
   const [userName, setuserName] = useState("");
   const [language, setlanguage] = useState("javascript");
-  const [code, setcode] = useState("");
+  const [code, setcode] = useState("//start code here");
 const [copySuccess,setcopySuccess]=  useState("")
 const [users , setUsers] = useState([])
 const [typing ,settyping] = useState("");
@@ -26,11 +26,16 @@ useEffect(()=>{
       settyping(`${user.slice(0,8)}... is Typing`)
       setTimeout(()=> settyping(""),2000)
     })
+    
+    socket.on("languageupdate",(newLanguage)=>{
+      setlanguage(newLanguage);
+    })
    
   return ()=>{
     socket.off("userjoined")
     socket.off("codeUpdate")
     socket.off("userTyping")
+    socket.off("languageupdate")
   }
 },[])
 
@@ -53,6 +58,16 @@ useEffect(()=>{
       setjoined(true);
     }
   };
+  const leaveRoom = ()=>{
+    socket.emit("leaveRoom")
+    setjoined(false)
+    setroomId("")
+      setuserName("")
+      setcode("//start code here")
+      setlanguage("javascript")
+
+    
+  }
   const copyroomid =()=>{ 
     navigator.clipboard.writeText(roomId)
     setcopySuccess("Copied!")
@@ -66,7 +81,7 @@ useEffect(()=>{
   }
   const handleLanguageChange = (e) => {
     const newLanguage = e.target.value;
-    setLanguage(newLanguage);
+    setlanguage(newLanguage);
     socket.emit("languageChange", { roomId, language: newLanguage });
   };
   if (!joined) {
@@ -105,13 +120,13 @@ useEffect(()=>{
         ) )}
         </ul>
           {typing && <p className='typing-indicator'>{typing}</p>}
-        <select className='language-selector' value={language} onChange={(e)=>setlanguage(e.target.value)}>
+        <select className='language-selector' value={language} onChange={handleLanguageChange}>
           <option value="javascript">Javascript</option>
           <option value="python">Python</option>
           <option value="java">java</option>
           <option value="cpp">C++</option>
         </select>
-        <button className="leave-button">Leave Room</button>
+        <button className="leave-button" onClick={leaveRoom}>Leave Room</button>
       </div>
       <div className="editor-wrapper">
         <Editor
@@ -133,4 +148,3 @@ useEffect(()=>{
 
 export default App;
 
-//1.14
